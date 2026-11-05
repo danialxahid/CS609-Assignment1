@@ -1,0 +1,27 @@
+
+name: Test CS609 Assignment
+
+on: [push, workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile and run
+        shell: pwsh
+        run: |
+          cl /nologo /EHsc CS609_Assignment1_TextFileAnalyzer_BC220403190.cpp /Fe:analyzer.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          Set-Content sample.txt 'Hello from CS609 test file' -NoNewline -Encoding ascii
+          "sample.txt" | .\analyzer.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          Set-Content large.txt ('A' * 2300) -NoNewline -Encoding ascii
+          "large.txt" | .\analyzer.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
